@@ -1,11 +1,11 @@
 function bind(func, context) {
   return function() {
-    return func.apply(context, [arg1, arg2]);
+    return func.apply(context, arguments);
   };
 }
 
 function bind(func, context) {
   return function() {
-    return func.call(context, arg1, arg2);
+    return func.call(context, arguments);
   };
 }
