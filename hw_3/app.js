@@ -7,10 +7,6 @@ var itemElementList = listElement.children;
 var inputElement = document.querySelector('.add-task__input');
 inputElement.addEventListener('keydown', onInputKeydown);
 
-var filterElement = document.querySelector('.filters');
-filterElement.addEventListener('click', onFilterClick);
-var selectedItem = document.querySelector('.filters__item_selected');
-
 var templateElement = document.getElementById('todoTemplate');
 var templateContainer = 'content' in templateElement ? templateElement.content : templateElement;
 
@@ -173,51 +169,49 @@ function appendStatistics(flag) {
     }
 }
 
-function onFilterClick(event) {
+var filterValues = {
+    ALL: 'all',
+    DONE: 'done',
+    TODO: 'todo'
+};
+
+var selectedFilter = filterValues.ALL;
+
+var filtersElement = document.querySelector('.filters');
+filtersElement.addEventListener('click', onFiltersClick);
+
+function onFiltersClick(event) {
     var target = event.target;
-    if (target.dataset.filter === 'done') {
-        onDoneFilterClick(target);
-    } else if (target.dataset.filter === 'all') {
-        onAllFilterClick(target)
-    } else {
-        onTodoFilterClick(target);
+    if (!target.classList.contains('filters__item')) {
+        return;
     }
+    var value = target.dataset.filter;
+    if (value === selectedFilter) {
+        return;
+    }
+    filtersElement.querySelector('.filters__item_selected').classList.remove('filters__item_selected');
+    target.classList.add('filters__item_selected');
+    selectedFilter = value;
+    renderFilteredList();
 }
 
-function onDoneFilterClick(argument) {
-    setSelectedFilter(argument);
-    Array.prototype.map.call(listElement.querySelectorAll('.task_todo'),
-        function(argument) {
-            argument.style.display = 'none';
-        });
-    Array.prototype.map.call(listElement.querySelectorAll('.task_done'),
-        function(argument) {
-            argument.style.display = '';
-        });
-}
-
-function onTodoFilterClick(argument) {
-    setSelectedFilter(argument);
-    Array.prototype.map.call(listElement.querySelectorAll('.task_done'),
-        function(argument) {
-            argument.style.display = 'none';
-        });
-    Array.prototype.map.call(listElement.querySelectorAll('.task_todo'),
-        function(argument) {
-            argument.style.display = '';
-        });
-}
-
-function onAllFilterClick(argument) {
-    setSelectedFilter(argument);
-    Array.prototype.map.call(listElement.children,
-        function(argument) {
-            argument.style.display = '';
-        });
-}
-
-function setSelectedFilter(argument) {
-    selectedItem.classList.toggle('filters__item_selected');
-    argument.classList.toggle('filters__item_selected');
-    selectedItem = argument;
+function renderFilteredList() {
+    var filteredList;
+    switch (selectedFilter) {
+        case filterValues.DONE:
+            filteredList = todoList.filter(function (task) {
+                return task.status === 'done';
+            });
+            break;
+        case filterValues.TODO:
+            filteredList = todoList.filter(function (task) {
+                return task.status === 'todo';
+            });
+            break;
+        default:
+            filteredList = todoList;
+            break;
+    }
+    listElement.innerHTML = '';
+    filteredList.forEach(insertTodoElement);
 }
