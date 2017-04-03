@@ -147,10 +147,10 @@ var statistics = {
 }
 
 // формируем счетчик статистики
-var stats = {
-    done: 0,
-    todo: 0
-};
+// var stats = {
+//     done: 0,
+//     todo: 0
+// };
 //
 // // необходимые DOM элементы
 // var statsElement = document.querySelector('.statistic');
@@ -479,10 +479,10 @@ var tasksDone = todoList.filter(function (item) {
     return item.status === 'done';
 }).length;
 
-stats = {
-    done: tasksDone,
-    todo: todoList.length - tasksDone
-};
+// stats = {
+//     done: tasksDone,
+//     todo: todoList.length - tasksDone
+// };
 
 statistics.myrender();
 //renderStats();
