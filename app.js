@@ -146,11 +146,11 @@ var statistics = {
     }
 }
 
-// // формируем счетчик статистики
-// var stats = {
-//     done: 0,
-//     todo: 0
-// };
+// формируем счетчик статистики
+var stats = {
+    done: 0,
+    todo: 0
+};
 //
 // // необходимые DOM элементы
 // var statsElement = document.querySelector('.statistic');
