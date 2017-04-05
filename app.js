@@ -101,95 +101,54 @@ inputElement.addEventListener('keydown', onInputKeydown);
  =            СТАТИСТИКА            =
  ==================================*/
 
-// function stats(classElement) {
-//     this.done = 0;
-//     this.left = 0;
-// }
-//
-// stats.prototype.myrender = function () {
-//     document.querySelector('.statistic__total').textContent = this.done + this.left;
-//     document.querySelector('.statistic__done').textContent = this.done;
-//     document.querySelector('.statistic__left').textContent = this.left;
-// }
-//
-// stats.prototype.myaddto = function (isTodo) {
-//     if (isTodo) {
-//             this.left.++;
+
+
+
+// var stats = {
+//     total: {
+//         element: document.querySelector('.statistic__total'),
+//     },
+//     done: {
+//         element: document.querySelector('.statistic__done'),
+//         value: tasksDone
+//     },
+//     left: {
+//         element: document.querySelector('.statistic__left'),
+//         value:todoList.length - tasksDone
+//     },
+//     myrender: function () {
+//         this.done.element.textContent = this.done.value;
+//         this.left.element.textContent = this.left.value;
+//         this.total.element.textContent = this.done.value + this.left.value;
+//     },
+//     myaddto: function (isTodo) {
+//         if (isTodo) {
+//             this.left.value++;
 //         } else {
-//             this.done.++;
+//             this.done.value++;
 //         }
 //         this.myrender();
-// }
-//
-// stats.prototype.mychange = function (isTodo) {
-//     if (isTodo) {
-//             this.left.--;
+//     },
+//     mychange: function (isTodo) {
+//         if (isTodo) {
+//             this.left.value++;
+//             this.done.value--;
 //         } else {
-//             this.done.--;
+//             this.left.value--;
+//             this.done.value++;
 //         }
 //         this.myrender();
-// }
-//
-// stats.prototype.mydelete = function (isTodo) {
-//     if (isTodo) {
-//             this.left.++;
-//             this.done.--;
+//     },
+//     mydelete: function (isTodo) {
+//         if (isTodo) {
+//             this.left.value--;
 //         } else {
-//             this.left.--;
-//             this.done.++;
+//             this.done.value--;
 //         }
 //         this.myrender();
-// }
-
-var tasksDone = todoList.filter(function (item) {
-    return item.status === 'done';
-}).length;
-
-var stats = {
-    total: {
-        element: document.querySelector('.statistic__total'),
-    },
-    done: {
-        element: document.querySelector('.statistic__done'),
-        value: tasksDone
-    },
-    left: {
-        element: document.querySelector('.statistic__left'),
-        value:todoList.length - tasksDone
-    },
-    myrender: function () {
-        this.done.element.textContent = this.done.value;
-        this.left.element.textContent = this.left.value;
-        this.total.element.textContent = this.done.value + this.left.value;
-    },
-    myaddto: function (isTodo) {
-        if (isTodo) {
-            this.left.value++;
-        } else {
-            this.done.value++;
-        }
-        this.myrender();
-    },
-    mychange: function (isTodo) {
-        if (isTodo) {
-            this.left.value++;
-            this.done.value--;
-        } else {
-            this.left.value--;
-            this.done.value++;
-        }
-        this.myrender();
-    },
-    mydelete: function (isTodo) {
-        if (isTodo) {
-            this.left.value--;
-        } else {
-            this.done.value--;
-        }
-        this.myrender();
-    }
-};
-
+//     }
+// };
+//
 
 var filterValues = {
     ALL: 'all',
@@ -331,7 +290,7 @@ function addTodo(name) {
     if (currentFilter !== filterValues.DONE) {
         insertTodoElement(newTask);
     }
-    stats.myaddto(true);
+    statistics.myaddto(true);
     //addToStats(true);
 }
 
@@ -366,9 +325,9 @@ function changeTodoStatus(element) {
     } else {
         listElement.removeChild(element);
     }
-    //displayTime(element);
+    displayTime(element);
     // и поменять статистику
-    stats.mychange(!isTodo);
+    statistics.mychange(!isTodo);
     //changeStats(!isTodo);
 }
 
@@ -382,41 +341,86 @@ function deleteTodo(element) {
     var isTodo = task.status === 'todo';
     todoList.splice(todoList.indexOf(task), 1);
     listElement.removeChild(element);
-    stats.mydelete(isTodo);
+    statistics.mydelete(isTodo);
     //deleteFromStats(isTodo);
 }
 
 // отрендерим первоначальный список тудушек
 todoList.forEach(insertTodoElement);
 
+var tasksDone = todoList.filter(function (item) {
+    return item.status === 'done';
+}).length;
+
+function stats(classElement) {
+    this.done = 0;
+    this.todo = 0;
+}
+
+stats.prototype.myrender = function () {
+    document.querySelector('.statistic__done').textContent = this.done;
+    document.querySelector('.statistic__left').textContent = this.todo;
+    document.querySelector('.statistic__total').textContent = this.done + this.todo;
+}
+
+stats.prototype.myaddto = function (isTodo) {
+    if (isTodo) {
+        this.todo++;
+    } else {
+        this.done++;
+    }
+    this.myrender();
+}
+
+stats.prototype.mydelete = function (isTodo) {
+    if (isTodo) {
+        this.todo--;
+    } else {
+        this.done--;
+    }
+    this.myrender();
+}
+
+stats.prototype.mychange = function (isTodo) {
+    if (isTodo) {
+        this.todo++;
+        this.done--;
+    } else {
+        this.todo--;
+        this.done++;
+    }
+    this.myrender();
+}
+
+var statistics = new stats();
+
+statistics.done = tasksDone;
+statistics.todo = todoList.length - tasksDone;
+
+statistics.myrender();
 
 //renderStats();
 //
 function displayTime(argument) {
     var current = new Date();
-    var currentString = '';
-    var myDate = [
-        current.getHours(),
-        current.getMinutes(),
-        current.getSeconds(),
-        current.getDate(),
-        current.getMonth() + 1,
-        current.getYear() - 100
-    ];
-    for (var i = 0; i < myDate.length; i++) {
-        if (myDate[i] < 10) {
-            currentString = currentString + '0';
-        }
-        currentString = currentString + myDate[i];
-        if (i === 0 || i === 1) {
-            currentString = currentString + ':';
-        } else if (i === 2) {
-            currentString = currentString + '<br>';
-        } else if (i === 3 || i === 4) {
-            currentString = currentString + '/';
-        }
-    }
-    argument.querySelector('.task__time').innerHTML =  currentString;
-}
 
-stats.myrender();
+    var ch = current.getHours();
+    if (ch < 10) ch = '0' + ch;
+
+    var cmin = current.getMinutes();
+    if (cmin < 10) cmin = '0' + cmin;
+
+    var csec = current.getSeconds();
+    if (csec < 10) csec = '0' + csec;
+
+    var cd = current.getDate();
+    if (cd < 10) cd = '0' + cd;
+
+    var cm = current.getMonth() + 1;
+    if (cm < 10) cm = '0' + cm;
+
+    var cy = current.getFullYear() % 100;
+    if (cy < 10) cy = '0' + cy;
+
+    argument.querySelector('.task__time').innerHTML =  ch + ':' + cmin + ':' + csec + '<br>' + cd + '/' + cm + '/' + cy;
+}
